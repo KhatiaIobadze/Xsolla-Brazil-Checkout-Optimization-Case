@@ -1,7 +1,7 @@
-## Xsolla-Brazil-Checkout-Optimization-Case
+# Xsolla-Brazil-Checkout-Optimization-Case
 Identifying payment method inefficiencies and user-level drop-off patterns using PostgreSQL &amp; SQL Analytics
 
-#  1. Introduction
+##  1. Introduction
 This project replicates a real-world checkout conversion problem in Brazil (BR region).
 The goal is to:
 - simulate traffic, payment attempts, and user behavior
@@ -10,9 +10,9 @@ The goal is to:
 - produce insights that a Product Analyst/BA would present
 - demonstrate SQL, data modeling, and analytical thinking
 
- #  2. Dataset Overview
+ ##  2. Dataset Overview
  We created a synthetic but realistic dataset stored in PostgreSQL.
- # Tables:
+ ### Tables:
 - `users` - user demographics, device, registration date
 - `payment_methods` - available checkout payment methods in BR
 - `payments` - simulated transactions (success/fail, method, device, date)
