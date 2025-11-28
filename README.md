@@ -1,4 +1,4 @@
-# Xsolla-Brazil-Checkout-Optimization-Case
+## Xsolla-Brazil-Checkout-Optimization-Case
 Identifying payment method inefficiencies and user-level drop-off patterns using PostgreSQL &amp; SQL Analytics
 
 #  1. Introduction
