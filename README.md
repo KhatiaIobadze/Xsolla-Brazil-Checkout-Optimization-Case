@@ -98,32 +98,58 @@ SQL + visualization in Power BI (optional)
 
 ## 7. Insights (Business Findings)
 
-აქ ბოლოს დავწერთ შენი აღმოჩენებს.
-მაგალითად:
+## 7. Insights (Core Finding)
 
-### Insight #1 — Local payment methods underperform
-Success rate for certain BR methods is significantly lower (7–15%).
-May indicate:
-- integration issues
-- timeout behavior
-- poor UX
-- bank-side declines
+### Primary Insight — Boleto is the main driver of checkout drop-offs
+Analysis shows that **Boleto has the lowest success rate among all payment methods**, significantly underperforming compared to PIX and Credit Card.
 
-### Insight #2 — Android users convert worse than iOS
-Possible reasons:
-- SDK difference
-- network quality
-- app version fragmentation
+This aligns with real-world characteristics of Boleto:
+- delayed offline confirmation  
+- frequent timeouts  
+- bank API instability  
+- users abandoning the payment after generating the slip  
 
-### Insight #3 — Peak failure times correlate with traffic spikes
-(ეს ყველაფერი ჩვენ ერთად დავამატებთ, როცა დავასრულებთ ანალიზს)
+**Business impact:**  
+Optimizing Boleto or redirecting users toward PIX can create an immediate uplift in Brazil's checkout conversion.
 
-## 8. Recommendations
+##  8. Recommendations & Prioritization
 
-- Prioritize fixing low-performing payment methods
-- Implement fallback method routing
-- Improve Android checkout UX
-- Add error logging granularity
+Given that **Boleto is the primary driver of checkout failures**, the optimization plan prioritizes fixes that directly reduce Boleto-related drop-offs.
+
+###  Priority #1 — Fix Boleto reliability (Highest Impact)
+- Reduce timeout thresholds
+- Improve bank-side API retry logic
+- Add fallback routing: Boleto → PIX
+- Provide clearer in-UI instructions for offline payment completion
+
+**Expected impact:** Immediate and measurable uplift in Brazil’s checkout conversion.
+
+---
+
+###  Priority #2 — Promote PIX as the default payment option
+- Display PIX at the top of the payment list
+- Add micro-copy explaining it is instant & high-success
+- Auto-suggest PIX when Boleto fails
+
+---
+
+###  Priority #3 — Improve performance during peak hours  
+(Not a root-cause, but amplifies failures)
+- Monitor queue processing
+- Add auto-scaling for BR traffic spikes
+
+---
+
+###  Priority #4 — Device-level UX improvements (Optional)
+- Optimize Android checkout flow
+- Detect slow network and offer instant fallback
+
+---
+
+### Summary  
+The roadmap is structured to fix the **core blocker first (Boleto)** while supporting improvements (PIX prioritization, load handling, device UX) that compound the overall conversion uplift.
+
+
 
 ## 9. Project Structure
 
