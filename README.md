@@ -17,10 +17,10 @@ The goal is to:
 - `payment_methods` - available checkout payment methods in BR
 - `payments` - simulated transactions (success/fail, method, device, date)
 
- # Schema Diagram
+ ### Schema Diagram
  (აქ შემდეგ დავამატებთ შენი pgAdmin-ის Diagram screenshot-ს)
 
- # 3. Tools & Technologies
+ ## 3. Tools & Technologies
  
  | Tool | Purpose | 
 |-----|------------------|
@@ -30,7 +30,7 @@ The goal is to:
 | **Power BI (optional)** | Visualization layer |
 | **PostgreSQL 18** | GitHub |
 
-# 4. Database Structure (DDL)
+## 4. Database Structure (DDL)
 
 ```sql
 user_id BIGINT PRIMARY KEY  
@@ -40,7 +40,7 @@ registration_dt DATE
 device_type VARCHAR(20)
 ```
 
-# payment_methods
+### payment_methods
 
 ```sql
 method_code VARCHAR(20) PRIMARY KEY  
@@ -49,7 +49,7 @@ method_type VARCHAR(20)
 is_local BOOLEAN
 ```
 
-# payments
+### payments
 
 ```sql
 payment_id BIGSERIAL PRIMARY KEY  
@@ -60,34 +60,34 @@ event_dt DATE
 device_type VARCHAR(20)
 ```
 
-# 5. Data Generation (Simulation)
+## 5. Data Generation (Simulation)
 
 აქ ჩავდებთ SQL-ს
 
-# 6. Analysis
+## 6. Analysis
 
-# 6.1. Payment Method Performance
+### 6.1. Payment Method Performance
 Metrics:
 - Total attempts
 - Successful transactions
 - Success rate %
 - Ranking of worst-performing methods
 
-# SQL Query:
+### SQL Query:
 აქ უკვე ჩავსვამთ შენს მიერ გაშვებულ PM performance query-ს
 
-# Screenshot of Result:
+### Screenshot of Result:
 აქ ჩასვამ სქრინს ან Excel export-ს
 
-# 6.2. Device-Level Drop-Off 
+### 6.2. Device-Level Drop-Off 
 Metrics:
 - Success rate by device
 - Volume comparison (Android vs iOS vs PC)
 
-# SQL Query:
+### SQL Query:
 აქ ჩავაგდებთ device breakdown query-ს
 
-# 6.3. Daily Traffic Behavior (BR Region)
+## 6.3. Daily Traffic Behavior (BR Region)
 
 Metrics:
 - raffic trend
@@ -96,12 +96,12 @@ Metrics:
 
 SQL + visualization in Power BI (optional)
 
-# 7. Insights (Business Findings)
+## 7. Insights (Business Findings)
 
 აქ ბოლოს დავწერთ შენი აღმოჩენებს.
 მაგალითად:
 
-# Insight #1 — Local payment methods underperform
+### Insight #1 — Local payment methods underperform
 Success rate for certain BR methods is significantly lower (7–15%).
 May indicate:
 - integration issues
@@ -109,23 +109,23 @@ May indicate:
 - poor UX
 - bank-side declines
 
-# Insight #2 — Android users convert worse than iOS
+### Insight #2 — Android users convert worse than iOS
 Possible reasons:
 - SDK difference
 - network quality
 - app version fragmentation
 
-# Insight #3 — Peak failure times correlate with traffic spikes
+### Insight #3 — Peak failure times correlate with traffic spikes
 (ეს ყველაფერი ჩვენ ერთად დავამატებთ, როცა დავასრულებთ ანალიზს)
 
-# 8. Recommendations
+## 8. Recommendations
 
 - Prioritize fixing low-performing payment methods
 - Implement fallback method routing
 - Improve Android checkout UX
 - Add error logging granularity
 
-# 9. Project Structure
+## 9. Project Structure
 
 xsolla-brazil-checkout-case/
 │
