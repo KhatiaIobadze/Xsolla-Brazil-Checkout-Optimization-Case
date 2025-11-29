@@ -66,18 +66,36 @@ device_type VARCHAR(20)
 
 ## 6. Analysis
 
-### 6.1. Payment Method Performance
-Metrics:
-- Total attempts
-- Successful transactions
-- Success rate %
-- Ranking of worst-performing methods
+### 6.1 Payment Method Performance
 
-### SQL Query:
-აქ უკვე ჩავსვამთ შენს მიერ გაშვებულ PM performance query-ს
+To understand which payment methods drive checkout drop-offs in Brazil, we first aggregated performance by `method_code`.
+
+**SQL query:**
+
+```sql
+SELECT
+    pm.method_code,
+    pm.method_name,
+    COUNT(*) AS attempts,
+    COUNT(*) FILTER (WHERE p.status = 'SUCCESS') AS success_count,
+    ROUND(
+        100.0 * AVG(
+            CASE 
+                WHEN p.status = 'SUCCESS' THEN 1.0 
+                ELSE 0.0 
+            END
+        ),
+        2
+    ) AS success_rate_pct
+FROM payments p
+JOIN payment_methods pm
+    ON p.method_code = pm.method_code
+GROUP BY pm.method_code, pm.method_name
+ORDER BY success_rate_pct ASC;
+```
 
 ### Screenshot of Result:
-აქ ჩასვამ სქრინს ან Excel export-ს
+![Payment Method Performance](screenshots.payment_method_performance.png)
 
 ### 6.2. Device-Level Drop-Off 
 Metrics:
