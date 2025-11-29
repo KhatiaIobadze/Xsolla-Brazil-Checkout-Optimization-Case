@@ -97,6 +97,14 @@ ORDER BY success_rate_pct ASC;
 ### Screenshot of Result:
 ![Payment Method Performance](screenshots.payment_method_performance.png)
 
+### Result (summary):
+
+- BOLETO – ~55.6% success rate (worst performer)
+- CC_VISA / CC_MC – ~79–80% success rate
+- PAYPAL – ~84.6% success rate
+- PIX – ~90.6% success rate (best performer)
+This confirms that Boleto is the main driver of checkout failures, while PIX and credit cards perform significantly better.
+
 ### 6.2. Device-Level Drop-Off 
 Metrics:
 - Success rate by device
