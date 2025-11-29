@@ -106,14 +106,13 @@ ORDER BY success_rate_pct ASC;
 
 #### This confirms that Boleto is the main driver of checkout failures, while PIX and credit cards perform significantly better.
 
-```
 
 ### 6.2 Device-Level Drop-Off Analysis
 
 To understand whether certain device types contribute more to checkout failures,  
 we performed a breakdown of success rate by `device_type`.
 
-### SQL query:
+**SQL query:** 
 
 ```sql
 SELECT
