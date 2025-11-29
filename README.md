@@ -106,13 +106,37 @@ ORDER BY success_rate_pct ASC;
 
 #### This confirms that Boleto is the main driver of checkout failures, while PIX and credit cards perform significantly better.
 
-### 6.2. Device-Level Drop-Off 
-Metrics:
-- Success rate by device
-- Volume comparison (Android vs iOS vs PC)
+```
 
-### SQL Query:
-აქ ჩავაგდებთ device breakdown query-ს
+### 6.2 Device-Level Drop-Off Analysis
+
+To understand whether certain device types contribute more to checkout failures,  
+we performed a breakdown of success rate by `device_type`.
+
+**SQL query:**
+
+```sql
+SELECT
+    u.device_type,
+    COUNT(*) AS attempts,
+    COUNT(*) FILTER (WHERE p.status = 'SUCCESS') AS success_count,
+    ROUND(
+        100.0 * AVG(
+            CASE WHEN p.status = 'SUCCESS' THEN 1.0 ELSE 0.0 END
+        ),
+        2
+    ) AS success_rate_pct
+FROM payments p
+JOIN users u
+    ON p.user_id = u.user_id
+GROUP BY u.device_type
+ORDER BY success_rate_pct ASC;
+```
+### Screenshot of Result:
+![Device Performance](screenshots.device_performance.png)
+
+### Device-Level Conclusion
+#### Device performance is stable across the board - no meaningful drop-off patterns.
 
 ## 6.3. Daily Traffic Behavior (BR Region)
 
