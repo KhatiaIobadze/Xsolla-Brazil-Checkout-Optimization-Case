@@ -113,7 +113,7 @@ ORDER BY success_rate_pct ASC;
 To understand whether certain device types contribute more to checkout failures,  
 we performed a breakdown of success rate by `device_type`.
 
-**SQL query:**
+### SQL query:
 
 ```sql
 SELECT
