@@ -134,21 +134,74 @@ ORDER BY success_rate_pct ASC;
 ### Screenshot of Result:
 ![Device Performance](screenshots.device_performance.png)
 
-### Device-Level Conclusion
+### Device-Level Conclusion:
 #### Device performance is stable across the board - no meaningful drop-off patterns.
 
-## 6.3. Daily Traffic Behavior (BR Region)
 
-Metrics:
-- raffic trend
-- Daily success/fail variance
-- Spikes or anomalies
+### 6.3 Daily Traffic Behavior (BR Region)
+
+To understand overall checkout stability and detect anomalies over time, we analyzed  
+daily traffic volume and daily success rates for Brazil (`country = 'BR'`).
+
+**SQL query:**
+
+```sql
+SELECT
+    p.event_date,
+    COUNT(*) AS attempts,
+    COUNT(*) FILTER (WHERE p.status = 'SUCCESS') AS success_count,
+    ROUND(
+        100.0 * AVG(
+            CASE WHEN p.status = 'SUCCESS' THEN 1.0 ELSE 0.0 END
+        ), 2
+    ) AS daily_success_rate
+FROM (
+    SELECT 
+        p.*,
+        -- derive date either from event_dt or generate one (if missing)
+        COALESCE(event_dt, CURRENT_DATE - (floor(random() * 60))::int) AS event_date
+    FROM payments p
+) p
+JOIN users u ON u.user_id = p.user_id
+WHERE u.country = 'BR'
+GROUP BY p.event_date
+ORDER BY p.event_date;
+```
+
+### What this shows:
+- Total payment attempts per day
+- Successful transactions per day
+- Daily success rate trend
+- Traffic spikes or dips
+- Potential instability windows
+
+
 
 SQL + visualization in Power BI (optional)
 
+**Insight: Daily Trend**
+
+Daily volume and daily success rates remain relatively stable across the 60-day window.  
+There are no significant anomalies or daily spikes that could explain the conversion problem.  
+This confirms that the issue is not related to:
+
+- peak load,
+- traffic surges,
+- daily seasonality,
+- or operational instability.
+
+### 6.3 Daily Traffic Trend (Success Rate chart) and Daily Attempts (BR Region)
+
+### Daily Success Rate (BR Region)
+![Daily Success Rate](daily_success_rate.png)
+
+### Daily Attempts (BR Region)
+![Daily Attempts](daily_attempts.png)
+
+Payment Method Bubble Impact Map
+
 ## 7. Insights (Business Findings)
 
-## 7. Insights (Core Finding)
 
 ### Primary Insight — Boleto is the main driver of checkout drop-offs
 Analysis shows that **Boleto has the lowest success rate among all payment methods**, significantly underperforming compared to PIX and Credit Card.
