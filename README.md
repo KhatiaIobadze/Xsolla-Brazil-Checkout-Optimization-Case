@@ -62,7 +62,8 @@ GROUP BY u.device_type;
 ![Device & Traffic](screenshots.Device.png) 
 
 ### Finding: 
-Success rates are consistent across Android, iOS, and Web (~79-82%), indicating **no platform-specific technical bugs**.
+Success rates are consistent across Android, iOS, and Web (~79-82%), **indicating no platform-specific technical bugs**.
+
 ---
 
 ## 4. Interactive Dashboard (Power BI)
