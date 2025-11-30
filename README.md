@@ -1,273 +1,113 @@
-# Xsolla-Brazil-Checkout-Optimization-Case
+# Xsolla Checkout Optimization Case Study - Brazil Region
 Identifying payment method inefficiencies and user-level drop-off patterns using PostgreSQL &amp; SQL Analytics
 
-##  1. Introduction
-This project replicates a real-world checkout conversion problem in Brazil (BR region).
-The goal is to:
-- simulate traffic, payment attempts, and user behavior
-- analyze conversion performance
-- detect root causes for drop-offs
-- produce insights that a Product Analyst/BA would present
-- demonstrate SQL, data modeling, and analytical thinking
+### Project Overview
+This project simulates a real-world payment conversion analysis for a digital merchant operating in Brazil. The goal is to identify why checkout drop-offs are happening, analyze payment method performance (Boleto vs. PIX vs. Cards), and provide data-driven recommendations to increase the overall **Conversion Rate**.
 
- ##  2. Dataset Overview
- We created a synthetic but realistic dataset stored in PostgreSQL.
- ### Tables:
-- `users` - user demographics, device, registration date
-- `payment_methods` - available checkout payment methods in BR
-- `payments` - simulated transactions (success/fail, method, device, date)
+**Role:** Business Analyst / Product Owner  
+**Tools Used:** SQL (PostgreSQL), Power BI, Data Modeling, Excel
 
- ### Schema Diagram
- (აქ შემდეგ დავამატებთ შენი pgAdmin-ის Diagram screenshot-ს)
+## 1. The Challenge & Objective
+The Product Team noticed a stagnation in checkout conversion rates in the Brazil region. The objective was to:
+1.  Analyze transaction data to detect failure patterns.
+2.  Compare local payment methods (Boleto, PIX) against global ones.
+3.  Build a monitoring dashboard for the stakeholders.
+4.  Propose an optimization roadmap.
+   
+ ## 2. Data Modeling & Schema
+To perform this analysis, I designed a **Star Schema** model optimized for analytics. The dataset includes **44,000+** simulated transaction records.
 
- ## 3. Tools & Technologies
- 
- | Tool | Purpose | 
-|-----|------------------|
-| **PostgreSQL 18** | Database & SQL execution |
-| **pgAdmin 4** | Table creation, import, queries |
-| **Excel / CSV** | Dataset preparation |
-| **Power BI (optional)** | Visualization layer |
-| **PostgreSQL 18** | GitHub |
+![Database Schema](ER.png)
 
-## 4. Database Structure (DDL)
+* **Fact Table:** `payments` (Contains every transaction attempt, status, and timestamp).
+* **Dimension Tables:** `users` (Demographics, devices) and `payment_methods` (Method type, local vs global status).
+---
 
-```sql
-user_id BIGINT PRIMARY KEY  
-country VARCHAR(2)  
-state VARCHAR(2)  
-registration_dt DATE  
-device_type VARCHAR(20)
-```
+## 3. SQL Analysis & Key Findings
 
-### payment_methods
-
-```sql
-method_code VARCHAR(20) PRIMARY KEY  
-method_name VARCHAR(50)  
-method_type VARCHAR(20)  
-is_local BOOLEAN
-```
-
-### payments
-
-```sql
-payment_id BIGSERIAL PRIMARY KEY  
-user_id BIGINT  
-method_code VARCHAR(20)  
-status VARCHAR(20)  
-event_dt DATE  
-device_type VARCHAR(20)
-```
-
-## 5. Data Generation (Simulation)
-
-აქ ჩავდებთ SQL-ს
-
-## 6. Analysis
-
-### 6.1 Payment Method Performance
-
-To understand which payment methods drive checkout drop-offs in Brazil, we first aggregated performance by `method_code`.
-
-**SQL query:**
+### A. Identifying the "Problem Child" (Payment Method Performance)
+I aggregated transaction attempts and calculated the success rate for each method to find the bottleneck.
 
 ```sql
 SELECT
-    pm.method_code,
     pm.method_name,
-    COUNT(*) AS attempts,
+    COUNT(*) AS total_attempts,
     COUNT(*) FILTER (WHERE p.status = 'SUCCESS') AS success_count,
-    ROUND(
-        100.0 * AVG(
-            CASE 
-                WHEN p.status = 'SUCCESS' THEN 1.0 
-                ELSE 0.0 
-            END
-        ),
-        2
-    ) AS success_rate_pct
+    ROUND(100.0 * AVG(CASE WHEN p.status = 'SUCCESS' THEN 1.0 ELSE 0.0 END), 2) AS conversion_rate
 FROM payments p
-JOIN payment_methods pm
-    ON p.method_code = pm.method_code
-GROUP BY pm.method_code, pm.method_name
-ORDER BY success_rate_pct ASC;
+JOIN payment_methods pm ON p.method_code = pm.method_code
+GROUP BY pm.method_name
+ORDER BY conversion_rate DESC;
 ```
-
-### Screenshot of Result:
+#### Screenshot of Result:
 ![Payment Method Performance](screenshots.payment_method_performance.png)
 
-### Result (summary):
+### Finding:
+- PIX is the top performer with a ~91% success rate.
+- Boleto Bancário is the main bottleneck with only ~56% success rate.
+- Credit Cards perform steadily around 80%.
 
-- BOLETO – ~55.6% success rate (worst performer)
-- CC_VISA / CC_MC – ~79–80% success rate
-- PAYPAL – ~84.6% success rate
-- PIX – ~90.6% success rate (best performer)
-
-#### This confirms that Boleto is the main driver of checkout failures, while PIX and credit cards perform significantly better.
-
-
-### 6.2 Device-Level Drop-Off Analysis
-
-To understand whether certain device types contribute more to checkout failures,  
-we performed a breakdown of success rate by `device_type`.
-
-**SQL query:** 
+### B. Device & Traffic Analysis
+To ensure there were no technical bugs on specific platforms, I analyzed performance by device type.
 
 ```sql
-SELECT
+SELECT 
     u.device_type,
-    COUNT(*) AS attempts,
-    COUNT(*) FILTER (WHERE p.status = 'SUCCESS') AS success_count,
-    ROUND(
-        100.0 * AVG(
-            CASE WHEN p.status = 'SUCCESS' THEN 1.0 ELSE 0.0 END
-        ),
-        2
-    ) AS success_rate_pct
+    ROUND(100.0 * AVG(CASE WHEN p.status = 'SUCCESS' THEN 1.0 ELSE 0.0 END), 2) as success_rate
 FROM payments p
-JOIN users u
-    ON p.user_id = u.user_id
-GROUP BY u.device_type
-ORDER BY success_rate_pct ASC;
+JOIN users u ON p.user_id = u.user_id
+GROUP BY u.device_type;
 ```
-### Screenshot of Result:
-![Device Performance](screenshots.device_performance.png)
+#### Screenshot of Result:
+![Device & Traffic](screenshots.Device.png) 
 
-### Device-Level Conclusion:
-#### Device performance is stable across the board - no meaningful drop-off patterns.
-
-
-### 6.3 Daily Traffic Behavior (BR Region)
-
-To understand overall checkout stability and detect anomalies over time, we analyzed  
-daily traffic volume and daily success rates for Brazil (`country = 'BR'`).
-
-**SQL query:**
-
-```sql
-SELECT
-    p.event_date,
-    COUNT(*) AS attempts,
-    COUNT(*) FILTER (WHERE p.status = 'SUCCESS') AS success_count,
-    ROUND(
-        100.0 * AVG(
-            CASE WHEN p.status = 'SUCCESS' THEN 1.0 ELSE 0.0 END
-        ), 2
-    ) AS daily_success_rate
-FROM (
-    SELECT 
-        p.*,
-        -- derive date either from event_dt or generate one (if missing)
-        COALESCE(event_dt, CURRENT_DATE - (floor(random() * 60))::int) AS event_date
-    FROM payments p
-) p
-JOIN users u ON u.user_id = p.user_id
-WHERE u.country = 'BR'
-GROUP BY p.event_date
-ORDER BY p.event_date;
-```
-
-### What this shows:
-- Total payment attempts per day
-- Successful transactions per day
-- Daily success rate trend
-- Traffic spikes or dips
-- Potential instability windows
-
-
-
-SQL + visualization in Power BI (optional)
-
-**Insight: Daily Trend**
-
-Daily volume and daily success rates remain relatively stable across the 60-day window.  
-There are no significant anomalies or daily spikes that could explain the conversion problem.  
-This confirms that the issue is not related to:
-
-- peak load,
-- traffic surges,
-- daily seasonality,
-- or operational instability.
-
-### 6.3 Daily Traffic Trend (Success Rate chart) and Daily Attempts (BR Region)
-
-### Daily Success Rate (BR Region)
-![Daily Success Rate](daily_success_rate.png)
-
-### Daily Attempts (BR Region)
-![Daily Attempts](daily_attempts.png)
-
-Payment Method Bubble Impact Map
-
-## 7. Insights (Business Findings)
-
-
-### Primary Insight — Boleto is the main driver of checkout drop-offs
-Analysis shows that **Boleto has the lowest success rate among all payment methods**, significantly underperforming compared to PIX and Credit Card.
-
-This aligns with real-world characteristics of Boleto:
-- delayed offline confirmation  
-- frequent timeouts  
-- bank API instability  
-- users abandoning the payment after generating the slip  
-
-**Business impact:**  
-Optimizing Boleto or redirecting users toward PIX can create an immediate uplift in Brazil's checkout conversion.
-
-##  8. Recommendations & Prioritization
-
-Given that **Boleto is the primary driver of checkout failures**, the optimization plan prioritizes fixes that directly reduce Boleto-related drop-offs.
-
-###  Priority #1 — Fix Boleto reliability (Highest Impact)
-- Reduce timeout thresholds
-- Improve bank-side API retry logic
-- Add fallback routing: Boleto → PIX
-- Provide clearer in-UI instructions for offline payment completion
-
-**Expected impact:** Immediate and measurable uplift in Brazil’s checkout conversion.
-
+### Finding: 
+Success rates are consistent across Android, iOS, and Web (~79-82%), indicating **no platform-specific technical bugs**.
 ---
 
-###  Priority #2 — Promote PIX as the default payment option
-- Display PIX at the top of the payment list
-- Add micro-copy explaining it is instant & high-success
-- Auto-suggest PIX when Boleto fails
+## 4. Interactive Dashboard (Power BI)
+I built an interactive dashboard to allow stakeholders to monitor health metrics and drill down into daily trends.
 
+![Dashboard](Checkout_Dashboard.png)
+
+### Dashboard Highlights:
+- **KPI Cards:** Immediate view of Total Volume (44K), Successful Payments (34K), and Conversion Rate (78%).
+- **Bubble Impact Map:** Visualizes the high volume / low performance of Boleto (Red Bubble) vs. the high value of PIX (Pink Bubble).
+- **Trend Line:** Monitors daily stability to rule out server outages or seasonal spikes.
 ---
 
-###  Priority #3 — Improve performance during peak hours  
-(Not a root-cause, but amplifies failures)
-- Monitor queue processing
-- Add auto-scaling for BR traffic spikes
+## 5. Business Recommendations
+Based on the data analysis, here is the proposed optimization roadmap:
 
----
+### Priority 1: Promote PIX (The "Quick Win")
+- **Observation:** PIX has a 91% success rate but lower volume than cards.
+- **Action:** Move PIX to the top of the checkout list and add a "Recommended" badge.
+- **Expected Impact:** Immediate uplift in overall conversion by shifting users from low-performing methods to PIX.
 
-###  Priority #4 — Device-level UX improvements (Optional)
-- Optimize Android checkout flow
-- Detect slow network and offer instant fallback
+### Priority 2: Fix Boleto Friction
+- **Observation:** Boleto causes 44% of its users to drop off (likely due to offline payment friction).
+- **Action:** Implement an email reminder sequence for users who generate a Boleto but don't pay.
+- **Action:** Reduce the timeout window to free up inventory faster.
 
----
+### Priority 3: Maintain Device Health
+**Observation:** Performance is stable across devices.
+**Action:** Continue monitoring via the dashboard to catch any regression in future app updates.
 
-### Summary  
-The roadmap is structured to fix the **core blocker first (Boleto)** while supporting improvements (PIX prioritization, load handling, device UX) that compound the overall conversion uplift.
+## Project Structure
 
+The repository is organized as follows:
 
-
-## 9. Project Structure
-
-xsolla-brazil-checkout-case/
-│
-├── data/                    # CSV files used for simulation (users, payments, traffic)
-│
-├── sql/                     # SQL scripts: DDL, inserts, main analytical queries
-│
-├── screenshots/             # pgAdmin query outputs, charts, Power BI visuals
-│
-├── analysis/                # Exported tables (CSV) with aggregated results
-│
-├── diagrams/                # ERD, schema visualization, flow diagrams (optional)
-│
-└── README.md                # Complete project documentation
-
-
+```text
+ checkout-optimization-case/
+├──  data/                 # Raw datasets (CSV/Excel) used for the simulation
+│   ├── users.csv
+│   ├── payments.csv
+│   └── payment_methods.csv
+├──  sql/                  # SQL scripts
+│   ├── schema_setup.sql     # Database creation and table DDL
+│   └── analysis_queries.sql # Queries used for insights (KPIs, Trends)
+├──  images/               # Visual assets for README
+│   ├── dashboard.png        # Final Power BI Dashboard screenshot
+│   └── ER.png               # Entity Relationship Diagram
+├──  analysis.pbix         # Power BI project file
+└──  README.md             # Project documentation and summary
