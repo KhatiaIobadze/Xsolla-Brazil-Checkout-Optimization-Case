@@ -20,6 +20,7 @@ To perform this analysis, I designed a **Star Schema** model optimized for analy
 
 * **Fact Table:** `payments` (Contains every transaction attempt, status, and timestamp).
 * **Dimension Tables:** `users` (Demographics, devices) and `payment_methods` (Method type, local vs global status).
+* **Aggregated Table:** `daily_traffic` (Contains summarized daily statistics, such as total attempts and success rates, grouped by country).
 ---
 
 ## 3. SQL Analysis & Key Findings
@@ -72,7 +73,7 @@ I built an interactive dashboard to allow stakeholders to monitor health metrics
 
 ### Dashboard Highlights:
 - **KPI Cards:** Immediate view of Total Volume (44K), Successful Payments (34K), and Conversion Rate (78%).
-- **Bubble Impact Map:** Visualizes the high volume / low performance of Boleto (Red Bubble) vs. the high value of PIX (Pink Bubble).
+- **Bubble Impact Map:** Visualizes the high volume / low performance of Boleto (Blue Bubble) vs. the high value of PIX (Pink Bubble).
 - **Trend Line:** Monitors daily stability to rule out server outages or seasonal spikes.
 ---
 
