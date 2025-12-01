@@ -1,5 +1,4 @@
 # Xsolla Checkout Optimization Case Study - Brazil Region
-Identifying payment method inefficiencies and user-level drop-off patterns using PostgreSQL &amp; SQL Analytics
 
 ### Project Overview
 This project simulates a real-world payment conversion analysis for a digital merchant operating in Brazil. The goal is to identify why checkout drop-offs are happening, analyze payment method performance (Boleto vs. PIX vs. Cards), and provide data-driven recommendations to increase the overall **Conversion Rate**.
