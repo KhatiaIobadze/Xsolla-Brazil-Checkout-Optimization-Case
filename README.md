@@ -104,7 +104,7 @@ The repository is organized as follows:
 │   ├── users.csv
 │   ├── payments.csv
 │   ├── payment_methods.csv
-│   └── daily_traffic
+│   └── daily_traffic.csv
 ├──  sql/                  # SQL scripts
 │   ├── schema_setup.sql     # Database creation and table DDL
 │   └── analysis_queries.sql # Queries used for insights (KPIs, Trends)
