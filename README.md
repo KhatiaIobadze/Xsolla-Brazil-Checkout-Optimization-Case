@@ -25,7 +25,7 @@ To perform this analysis, I designed a **Star Schema** model optimized for analy
 
 ## 3. SQL Analysis & Key Findings
 
-### A. Identifying the "Problem Child" (Payment Method Performance)
+### A. Identifying the Problem (Payment Method Performance)
 I aggregated transaction attempts and calculated the success rate for each method to find the bottleneck.
 
 ```sql
